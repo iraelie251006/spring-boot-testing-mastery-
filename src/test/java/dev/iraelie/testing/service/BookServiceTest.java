@@ -121,10 +121,15 @@ class BookServiceTest {
     @DisplayName("Create Book tests")
     class CreateBook {
         @Test
+        @DisplayName("Validate Isbn does not exists")
         void validateIsbnDoesNotExist() {}
+
         @Test
+        @DisplayName("Validate Author Exists")
         void validateAuthorExists() {}
+
         @Test
+        @DisplayName("Validate Publisher Exists")
         void validatePublisherExists() {}
     }
 }
