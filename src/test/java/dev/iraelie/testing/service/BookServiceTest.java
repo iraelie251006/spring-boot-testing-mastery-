@@ -72,5 +72,44 @@ class BookServiceTest {
                 .author(this.author)
                 .publisher(this.publisher)
                 .build();
+
+        this.authorDTO = AuthorDTO.builder()
+                .id(2L)
+                .firstName("John")
+                .lastName("Doe")
+                .email("john@gmail.com")
+                .country("Rwanda")
+                .totalBooks(20)
+                .build();
+
+        this.bookDTO = BookDTO.builder()
+                .id(1L)
+                .title("Master System design")
+                .isbn("5155172381")
+                .publicationYear(2026)
+                .availableCopies(200)
+                .price(49.9)
+                .genre(BookGenre.valueOf("SCIENCE"))
+                .authorName(this.author.getFirstName() + this.author.getLastName())
+                .publisherName(this.publisher.getName())
+                .build();
+
+        this.createBookRequest = CreateBookRequest.builder()
+                .title("Master System design")
+                .isbn("5155172381")
+                .publicationYear(2026)
+                .availableCopies(200)
+                .price(49.9)
+                .genre(BookGenre.valueOf("SCIENCE"))
+                .authorId(this.author.getId())
+                .publisherId(this.publisher.getId())
+                .build();
+
+        this.updateBookRequest = UpdateBookRequest.builder()
+                .title("Master System design and DSA")
+                .availableCopies(100)
+                .price(99.9)
+                .publisherId(this.publisher.getId())
+                .build();
     }
 }
