@@ -116,5 +116,9 @@ class BookServiceTest {
     }
 
     @DisplayName("Create Book tests")
-    public static class CreateBook {}
+    public static class CreateBook {
+        void validateIsbnDoesNotExist() {}
+        void validateAuthorExists() {}
+        void validatePublisherExists() {}
+    }
 }
