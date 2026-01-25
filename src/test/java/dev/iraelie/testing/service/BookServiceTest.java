@@ -14,6 +14,7 @@ import dev.iraelie.testing.repository.BookRepository;
 import dev.iraelie.testing.repository.PublisherRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -117,8 +118,11 @@ class BookServiceTest {
 
     @DisplayName("Create Book tests")
     public static class CreateBook {
+        @Test
         void validateIsbnDoesNotExist() {}
+        @Test
         void validateAuthorExists() {}
+        @Test
         void validatePublisherExists() {}
     }
 }
