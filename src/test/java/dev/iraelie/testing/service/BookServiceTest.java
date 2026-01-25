@@ -14,6 +14,7 @@ import dev.iraelie.testing.repository.BookRepository;
 import dev.iraelie.testing.repository.PublisherRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -116,8 +117,9 @@ class BookServiceTest {
                 .build();
     }
 
+    @Nested
     @DisplayName("Create Book tests")
-    public static class CreateBook {
+    class CreateBook {
         @Test
         void validateIsbnDoesNotExist() {}
         @Test
