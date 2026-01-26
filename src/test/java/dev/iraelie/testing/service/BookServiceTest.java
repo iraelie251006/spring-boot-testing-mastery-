@@ -213,4 +213,50 @@ class BookServiceTest {
             verifyNoInteractions(BookServiceTest.this.bookMapper);
         }
     }
+
+    @Nested
+    @DisplayName("Updates book detail tests")
+    class UpdatesBookDetailTests {
+        @Test
+        @DisplayName("Validates book exists")
+        void shouldThrowErrorIfNotExists() {
+            Long bookId = 1L;
+            UpdateBookRequest request = BookServiceTest.this.updateBookRequest;
+            when(BookServiceTest.this.bookRepository.findById(bookId))
+                    .thenReturn(Optional.empty());
+
+            ResourceNotFoundException exception = assertThrows(
+                    ResourceNotFoundException.class,
+                    () -> BookServiceTest.this.bookService.updateBook(bookId, request)
+            );
+
+            assertEquals("Book not found with id: " + bookId, exception.getMessage());
+            verify(BookServiceTest.this.bookRepository).findById(bookId);
+            verifyNoInteractions(BookServiceTest.this.publisherRepository);
+            verifyNoInteractions(BookServiceTest.this.bookMapper);
+        }
+
+        @Test
+        @DisplayName("Validates publisher if being updated")
+        void shouldUpdatePublisher() {
+            Long bookId = 1L;
+            UpdateBookRequest request = BookServiceTest.this.updateBookRequest;
+            when(BookServiceTest.this.bookRepository.findById(bookId))
+                    .thenReturn(Optional.of(BookServiceTest.this.book));
+            when(BookServiceTest.this.publisherRepository.findById(request.getPublisherId()))
+                    .thenReturn(Optional.empty());
+
+            ResourceNotFoundException exception = assertThrows(
+                    ResourceNotFoundException.class,
+                    () -> BookServiceTest.this.bookService.updateBook(bookId, request)
+            );
+
+            assertNotNull(request.getPublisherId());
+            assertEquals("Publisher not found with id: " + request.getPublisherId(), exception.getMessage());
+            assertEquals(book.getPublisher().getName(), publisher.getName());
+            verify(BookServiceTest.this.bookRepository).findById(bookId);
+            verify(BookServiceTest.this.publisherRepository).findById(request.getPublisherId());
+            verifyNoInteractions(BookServiceTest.this.bookMapper);
+        }
+    }
 }
