@@ -282,4 +282,44 @@ class BookServiceTest {
             verifyNoInteractions(BookServiceTest.this.bookMapper);
         }
     }
+
+    @Nested
+    @DisplayName("Gets author with their book count tests")
+    class GetAuthorWithBooksTests {
+        @Test
+        @DisplayName("Throws exception when author does not exist")
+        void shouldThrowWhenAuthorDoesNotExist() {
+            Long authorId = 1L;
+
+            when(BookServiceTest.this.authorRepository.findByIdWithBooks(authorId))
+                    .thenReturn(Optional.empty());
+
+            ResourceNotFoundException exception = assertThrows(
+                    ResourceNotFoundException.class,
+                    () -> BookServiceTest.this.bookService.getAuthorWithBooks(authorId)
+            );
+
+            assertEquals("Author not found with id: " + authorId, exception.getMessage());
+            verify(BookServiceTest.this.authorRepository, times(1)).findByIdWithBooks(authorId);
+            verifyNoInteractions(BookServiceTest.this.bookMapper);
+        }
+
+        @Test
+        @DisplayName("Validate author book counts")
+        void shouldReturnAuthorWithBookCount() {
+            Long authorId = 1L;
+
+            when(BookServiceTest.this.authorRepository.findByIdWithBooks(authorId))
+                    .thenReturn(Optional.of(BookServiceTest.this.author));
+
+            when(BookServiceTest.this.bookMapper.toAuthorDTO(BookServiceTest.this.author))
+                    .thenReturn(BookServiceTest.this.authorDTO);
+
+            AuthorDTO authorBookCounts = BookServiceTest.this.bookService.getAuthorWithBooks(authorId);
+
+            assertEquals(20, authorBookCounts.getTotalBooks());
+            verify(BookServiceTest.this.authorRepository).findByIdWithBooks(authorId);
+            verify(BookServiceTest.this.bookMapper).toAuthorDTO(author);
+        }
+    }
 }
