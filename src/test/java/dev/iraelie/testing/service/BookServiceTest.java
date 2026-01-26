@@ -259,4 +259,27 @@ class BookServiceTest {
             verifyNoInteractions(BookServiceTest.this.bookMapper);
         }
     }
+
+    @Nested
+    @DisplayName("Gets all books by an author")
+    class GetBooksByAuthorTests {
+        @Test
+        @DisplayName("Validate author exists")
+        void validateIfAuthorExists() {
+            Long authorId = 1L;
+
+            when(BookServiceTest.this.authorRepository.findById(authorId))
+                    .thenReturn(Optional.empty());
+
+            ResourceNotFoundException exception = assertThrows(
+                    ResourceNotFoundException.class,
+                    () -> BookServiceTest.this.bookService.getBooksByAuthor(authorId)
+            );
+
+            assertEquals("Author not found with id: " + authorId, exception.getMessage());
+            verify(BookServiceTest.this.authorRepository, times(1)).findById(authorId);
+            verifyNoInteractions(BookServiceTest.this.bookRepository);
+            verifyNoInteractions(BookServiceTest.this.bookMapper);
+        }
+    }
 }
