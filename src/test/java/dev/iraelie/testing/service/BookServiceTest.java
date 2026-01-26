@@ -160,7 +160,7 @@ class BookServiceTest {
             );
 
             assertEquals("Author not found with id: " + request.getAuthorId(), exception.getMessage());
-            verify(BookServiceTest.this.bookRepository).findByIsbn(request.getIsbn());
+            verify(BookServiceTest.this.bookRepository, times(1)).findByIsbn(request.getIsbn());
             verify(BookServiceTest.this.authorRepository, times(1)).findById(request.getAuthorId());
             verifyNoInteractions(BookServiceTest.this.publisherRepository);
             verifyNoInteractions(BookServiceTest.this.bookMapper);
@@ -185,10 +185,47 @@ class BookServiceTest {
             );
 
             assertEquals("Publisher not found with id: " + request.getPublisherId(), exception.getMessage());
-            verify(BookServiceTest.this.bookRepository).findByIsbn(request.getIsbn());
-            verify(BookServiceTest.this.authorRepository).findById(request.getAuthorId());
+            verify(BookServiceTest.this.bookRepository, times(1)).findByIsbn(request.getIsbn());
+            verify(BookServiceTest.this.authorRepository, times(1)).findById(request.getAuthorId());
             verify(BookServiceTest.this.publisherRepository, times(1)).findById(request.getPublisherId());
             verifyNoInteractions(BookServiceTest.this.bookMapper);
+        }
+
+        @Test
+        @DisplayName("Should create book successfully when all validations pass")
+        void shouldCreateBookSuccessfully() {
+            // Given
+            CreateBookRequest request = BookServiceTest.this.createBookRequest;
+            when(BookServiceTest.this.bookRepository.findByIsbn(request.getIsbn()))
+                    .thenReturn(Optional.empty());
+            when(BookServiceTest.this.authorRepository.findById(request.getAuthorId()))
+                    .thenReturn(Optional.of(BookServiceTest.this.author));
+            when(BookServiceTest.this.publisherRepository.findById(request.getPublisherId()))
+                    .thenReturn(Optional.of(BookServiceTest.this.publisher));
+            when(BookServiceTest.this.bookMapper.toBook(request))
+                    .thenReturn(BookServiceTest.this.book);
+            when(BookServiceTest.this.bookRepository.save(any(Book.class)))
+                    .thenReturn(BookServiceTest.this.book);
+
+            // When
+            Long result = BookServiceTest.this.bookService.createBook(request);
+
+            // Then
+            assertNotNull(result);
+            assertEquals(1L, result);
+            verify(BookServiceTest.this.bookRepository, times(1)).findByIsbn(request.getIsbn());
+            verify(BookServiceTest.this.authorRepository, times(1)).findById(request.getAuthorId());
+            verify(BookServiceTest.this.publisherRepository, times(1)).findById(request.getPublisherId());
+            verify(BookServiceTest.this.bookMapper, times(1)).toBook(request);
+            verify(BookServiceTest.this.bookRepository, times(1)).save(any(Book.class));
+
+            // Verify author and publisher were set
+            verify(BookServiceTest.this.bookRepository, times(1)).save(argThat(book ->
+                    book.getAuthor() != null &&
+                            book.getPublisher() != null &&
+                            book.getAuthor().getId().equals(2L) &&
+                            book.getPublisher().getId().equals(3L)
+            ));
         }
     }
 
@@ -209,7 +246,7 @@ class BookServiceTest {
             );
             // Then
             assertEquals("Book not found with id: " + 1L, exception.getMessage());
-            verify(BookServiceTest.this.bookRepository).findById(bookId);
+            verify(BookServiceTest.this.bookRepository, times(1)).findById(bookId);
             verifyNoInteractions(BookServiceTest.this.bookMapper);
         }
     }
@@ -231,7 +268,7 @@ class BookServiceTest {
             );
 
             assertEquals("Book not found with id: " + bookId, exception.getMessage());
-            verify(BookServiceTest.this.bookRepository).findById(bookId);
+            verify(BookServiceTest.this.bookRepository, times(1)).findById(bookId);
             verifyNoInteractions(BookServiceTest.this.publisherRepository);
             verifyNoInteractions(BookServiceTest.this.bookMapper);
         }
@@ -254,8 +291,8 @@ class BookServiceTest {
             assertNotNull(request.getPublisherId());
             assertEquals("Publisher not found with id: " + request.getPublisherId(), exception.getMessage());
             assertEquals(book.getPublisher().getName(), publisher.getName());
-            verify(BookServiceTest.this.bookRepository).findById(bookId);
-            verify(BookServiceTest.this.publisherRepository).findById(request.getPublisherId());
+            verify(BookServiceTest.this.bookRepository, times(1)).findById(bookId);
+            verify(BookServiceTest.this.publisherRepository, times(1)).findById(request.getPublisherId());
             verifyNoInteractions(BookServiceTest.this.bookMapper);
         }
     }
@@ -318,8 +355,8 @@ class BookServiceTest {
             AuthorDTO authorBookCounts = BookServiceTest.this.bookService.getAuthorWithBooks(authorId);
 
             assertEquals(20, authorBookCounts.getTotalBooks());
-            verify(BookServiceTest.this.authorRepository).findByIdWithBooks(authorId);
-            verify(BookServiceTest.this.bookMapper).toAuthorDTO(author);
+            verify(BookServiceTest.this.authorRepository, times(1)).findByIdWithBooks(authorId);
+            verify(BookServiceTest.this.bookMapper, times(1)).toAuthorDTO(author);
         }
     }
 
@@ -339,7 +376,7 @@ class BookServiceTest {
             );
 
             assertEquals("Book not found with id: " + bookId, exception.getMessage());
-            verify(BookServiceTest.this.bookRepository).existsById(bookId);
+            verify(BookServiceTest.this.bookRepository, times(1)).existsById(bookId);
             verify(BookServiceTest.this.bookRepository, never()).deleteById(bookId);
         }
 
@@ -354,8 +391,8 @@ class BookServiceTest {
                     () -> BookServiceTest.this.bookService.deleteBook(bookId)
             );
 
-            verify(BookServiceTest.this.bookRepository).existsById(bookId);
-            verify(BookServiceTest.this.bookRepository).deleteById(bookId);
+            verify(BookServiceTest.this.bookRepository, times(1)).existsById(bookId);
+            verify(BookServiceTest.this.bookRepository, times(1)).deleteById(bookId);
         }
     }
 }
