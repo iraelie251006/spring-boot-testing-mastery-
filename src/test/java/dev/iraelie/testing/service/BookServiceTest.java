@@ -322,4 +322,40 @@ class BookServiceTest {
             verify(BookServiceTest.this.bookMapper).toAuthorDTO(author);
         }
     }
+
+    @Nested
+    @DisplayName("Delete book tests")
+    class DeleteBookTests {
+        @Test
+        @DisplayName("Check if book exists if not throw an exception")
+        void shouldThrowExceptionExistsIfBookNotExists() {
+            Long bookId = 1L;
+            when(BookServiceTest.this.bookRepository.existsById(bookId))
+                    .thenReturn(false);
+
+            ResourceNotFoundException exception = assertThrows(
+                    ResourceNotFoundException.class,
+                    () -> BookServiceTest.this.bookService.deleteBook(bookId)
+            );
+
+            assertEquals("Book not found with id: " + bookId, exception.getMessage());
+            verify(BookServiceTest.this.bookRepository).existsById(bookId);
+            verify(BookServiceTest.this.bookRepository, never()).deleteById(bookId);
+        }
+
+        @Test
+        @DisplayName("Should delete the book")
+        void shouldDeleteTheBook() {
+            Long bookId = 1L;
+            when(BookServiceTest.this.bookRepository.existsById(bookId))
+                    .thenReturn(true);
+
+            assertDoesNotThrow(
+                    () -> BookServiceTest.this.bookService.deleteBook(bookId)
+            );
+
+            verify(BookServiceTest.this.bookRepository).existsById(bookId);
+            verify(BookServiceTest.this.bookRepository).deleteById(bookId);
+        }
+    }
 }
