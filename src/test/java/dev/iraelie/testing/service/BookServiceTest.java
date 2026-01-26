@@ -18,7 +18,6 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
@@ -189,6 +188,28 @@ class BookServiceTest {
             verify(BookServiceTest.this.bookRepository).findByIsbn(request.getIsbn());
             verify(BookServiceTest.this.authorRepository).findById(request.getAuthorId());
             verify(BookServiceTest.this.publisherRepository, times(1)).findById(request.getPublisherId());
+            verifyNoInteractions(BookServiceTest.this.bookMapper);
+        }
+    }
+
+    @Nested
+    @DisplayName("Get Book By Id Validation Tests")
+    class GetBookByIdValidationTests {
+        @Test
+        @DisplayName("Get Book by id test")
+        void getBookById() {
+            // Given
+            Long bookId = 1L;
+            when(BookServiceTest.this.bookRepository.findById(bookId))
+                    .thenReturn(Optional.empty());
+            // When
+            ResourceNotFoundException exception = assertThrows(
+                    ResourceNotFoundException.class,
+                    () -> BookServiceTest.this.bookService.getBookById(bookId)
+            );
+            // Then
+            assertEquals("Book not found with id: " + 1L, exception.getMessage());
+            verify(BookServiceTest.this.bookRepository).findById(bookId);
             verifyNoInteractions(BookServiceTest.this.bookMapper);
         }
     }
