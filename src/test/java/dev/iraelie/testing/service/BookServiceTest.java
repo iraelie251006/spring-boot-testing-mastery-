@@ -4,6 +4,8 @@ import dev.iraelie.testing.dtos.AuthorDTO;
 import dev.iraelie.testing.dtos.BookDTO;
 import dev.iraelie.testing.dtos.CreateBookRequest;
 import dev.iraelie.testing.dtos.UpdateBookRequest;
+import dev.iraelie.testing.exception.DuplicateResourceException;
+import dev.iraelie.testing.exception.ResourceNotFoundException;
 import dev.iraelie.testing.mapper.BookMapper;
 import dev.iraelie.testing.model.Author;
 import dev.iraelie.testing.model.Book;
@@ -12,16 +14,18 @@ import dev.iraelie.testing.model.Publisher;
 import dev.iraelie.testing.repository.AuthorRepository;
 import dev.iraelie.testing.repository.BookRepository;
 import dev.iraelie.testing.repository.PublisherRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @DisplayName("Book Service tests")
 @ExtendWith(MockitoExtension.class)
@@ -118,18 +122,74 @@ class BookServiceTest {
     }
 
     @Nested
-    @DisplayName("Create Book tests")
-    class CreateBook {
+    @DisplayName("Create Book validation tests")
+    class CreateBookValidationTests {
         @Test
-        @DisplayName("Validate Isbn does not exists")
-        void validateIsbnDoesNotExist() {}
+        @DisplayName("Validate Isbn does already exists")
+        void validateIsbnDoesAlreadyExist() {
+            // Given
+            CreateBookRequest request = BookServiceTest.this.createBookRequest;
+            when(BookServiceTest.this.bookRepository.findByIsbn(request.getIsbn()))
+                    .thenReturn(Optional.of(BookServiceTest.this.book));
+            // When
+            DuplicateResourceException exception = assertThrows(
+                    DuplicateResourceException.class,
+                    () -> BookServiceTest.this.bookService.createBook(request)
+                    );
+            // Then
+            assertEquals("Book with ISBN " + request.getIsbn() + " already exists", exception.getMessage());
+
+            verify(BookServiceTest.this.bookRepository, times(1)).findByIsbn(request.getIsbn());
+            verifyNoInteractions(BookServiceTest.this.authorRepository);
+            verifyNoInteractions(BookServiceTest.this.publisherRepository);
+            verifyNoInteractions(BookServiceTest.this.bookMapper);
+        }
 
         @Test
-        @DisplayName("Validate Author Exists")
-        void validateAuthorExists() {}
+        @DisplayName("Validate If Author Exists")
+        void validateIfAuthorExists() {
+            CreateBookRequest request = BookServiceTest.this.createBookRequest;
+            when(bookRepository.findByIsbn(request.getIsbn()))
+                    .thenReturn(Optional.empty());
+
+            when(BookServiceTest.this.authorRepository.findById(request.getAuthorId()))
+                    .thenReturn(Optional.empty());
+
+            ResourceNotFoundException exception = assertThrows(
+                    ResourceNotFoundException.class,
+                    () -> BookServiceTest.this.bookService.createBook(request)
+            );
+
+            assertEquals("Author not found with id: " + request.getAuthorId(), exception.getMessage());
+            verify(BookServiceTest.this.bookRepository).findByIsbn(request.getIsbn());
+            verify(BookServiceTest.this.authorRepository, times(1)).findById(request.getAuthorId());
+            verifyNoInteractions(BookServiceTest.this.publisherRepository);
+            verifyNoInteractions(BookServiceTest.this.bookMapper);
+        }
 
         @Test
-        @DisplayName("Validate Publisher Exists")
-        void validatePublisherExists() {}
+        @DisplayName("Validate If Publisher Exists")
+        void validateIfPublisherExists() {
+            CreateBookRequest request = BookServiceTest.this.createBookRequest;
+            when(bookRepository.findByIsbn(request.getIsbn()))
+                    .thenReturn(Optional.empty());
+
+            when(authorRepository.findById(request.getAuthorId()))
+                    .thenReturn(Optional.of(author));
+
+            when(BookServiceTest.this.publisherRepository.findById(request.getPublisherId()))
+                    .thenReturn(Optional.empty());
+
+            ResourceNotFoundException exception = assertThrows(
+                    ResourceNotFoundException.class,
+                    () -> BookServiceTest.this.bookService.createBook(request)
+            );
+
+            assertEquals("Publisher not found with id: " + request.getPublisherId(), exception.getMessage());
+            verify(BookServiceTest.this.bookRepository).findByIsbn(request.getIsbn());
+            verify(BookServiceTest.this.authorRepository).findById(request.getAuthorId());
+            verify(BookServiceTest.this.publisherRepository, times(1)).findById(request.getPublisherId());
+            verifyNoInteractions(BookServiceTest.this.bookMapper);
+        }
     }
 }
