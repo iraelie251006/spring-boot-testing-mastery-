@@ -147,6 +147,7 @@ class BookServiceTest {
         @Test
         @DisplayName("Validate If Author Exists")
         void validateIfAuthorExists() {
+            // Given
             CreateBookRequest request = BookServiceTest.this.createBookRequest;
             when(bookRepository.findByIsbn(request.getIsbn()))
                     .thenReturn(Optional.empty());
@@ -169,6 +170,7 @@ class BookServiceTest {
         @Test
         @DisplayName("Validate If Publisher Exists")
         void validateIfPublisherExists() {
+            // Given
             CreateBookRequest request = BookServiceTest.this.createBookRequest;
             when(bookRepository.findByIsbn(request.getIsbn()))
                     .thenReturn(Optional.empty());
@@ -257,6 +259,7 @@ class BookServiceTest {
         @Test
         @DisplayName("Validates book exists")
         void shouldThrowErrorIfNotExists() {
+            // Given
             Long bookId = 1L;
             UpdateBookRequest request = BookServiceTest.this.updateBookRequest;
             when(BookServiceTest.this.bookRepository.findById(bookId))
@@ -276,6 +279,7 @@ class BookServiceTest {
         @Test
         @DisplayName("Validates publisher if being updated")
         void shouldUpdatePublisher() {
+            // Given
             Long bookId = 1L;
             UpdateBookRequest request = BookServiceTest.this.updateBookRequest;
             when(BookServiceTest.this.bookRepository.findById(bookId))
@@ -303,6 +307,7 @@ class BookServiceTest {
         @Test
         @DisplayName("Validate author exists")
         void validateIfAuthorExists() {
+            // Given
             Long authorId = 1L;
 
             when(BookServiceTest.this.authorRepository.findById(authorId))
@@ -323,6 +328,7 @@ class BookServiceTest {
     @Nested
     @DisplayName("Gets author with their book count tests")
     class GetAuthorWithBooksTests {
+        // Given
         @Test
         @DisplayName("Throws exception when author does not exist")
         void shouldThrowWhenAuthorDoesNotExist() {
@@ -344,6 +350,7 @@ class BookServiceTest {
         @Test
         @DisplayName("Validate author book counts")
         void shouldReturnAuthorWithBookCount() {
+            // Given
             Long authorId = 1L;
 
             when(BookServiceTest.this.authorRepository.findByIdWithBooks(authorId))
@@ -366,6 +373,7 @@ class BookServiceTest {
         @Test
         @DisplayName("Check if book exists if not throw an exception")
         void shouldThrowExceptionExistsIfBookNotExists() {
+            // Given
             Long bookId = 1L;
             when(BookServiceTest.this.bookRepository.existsById(bookId))
                     .thenReturn(false);
@@ -383,6 +391,7 @@ class BookServiceTest {
         @Test
         @DisplayName("Should delete the book")
         void shouldDeleteTheBook() {
+            // Given
             Long bookId = 1L;
             when(BookServiceTest.this.bookRepository.existsById(bookId))
                     .thenReturn(true);
