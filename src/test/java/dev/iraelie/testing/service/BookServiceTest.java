@@ -161,6 +161,7 @@ class BookServiceTest {
                     () -> BookServiceTest.this.bookService.createBook(request)
             );
 
+            // Then
             assertEquals("Author not found with id: " + request.getAuthorId(), exception.getMessage());
             verify(BookServiceTest.this.bookRepository, times(1)).findByIsbn(request.getIsbn());
             verify(BookServiceTest.this.authorRepository, times(1)).findById(request.getAuthorId());
@@ -182,11 +183,13 @@ class BookServiceTest {
             when(BookServiceTest.this.publisherRepository.findById(request.getPublisherId()))
                     .thenReturn(Optional.empty());
 
+            // When
             ResourceNotFoundException exception = assertThrows(
                     ResourceNotFoundException.class,
                     () -> BookServiceTest.this.bookService.createBook(request)
             );
 
+            // Then
             assertEquals("Publisher not found with id: " + request.getPublisherId(), exception.getMessage());
             verify(BookServiceTest.this.bookRepository, times(1)).findByIsbn(request.getIsbn());
             verify(BookServiceTest.this.authorRepository, times(1)).findById(request.getAuthorId());
@@ -272,6 +275,7 @@ class BookServiceTest {
                     () -> BookServiceTest.this.bookService.updateBook(bookId, request)
             );
 
+            // Then
             assertEquals("Book not found with id: " + bookId, exception.getMessage());
             verify(BookServiceTest.this.bookRepository, times(1)).findById(bookId);
             verifyNoInteractions(BookServiceTest.this.publisherRepository);
@@ -295,6 +299,7 @@ class BookServiceTest {
                     () -> BookServiceTest.this.bookService.updateBook(bookId, request)
             );
 
+            // Then
             assertNotNull(request.getPublisherId());
             assertEquals("Publisher not found with id: " + request.getPublisherId(), exception.getMessage());
             assertEquals(book.getPublisher().getName(), publisher.getName());
@@ -322,6 +327,7 @@ class BookServiceTest {
                     () -> BookServiceTest.this.bookService.getBooksByAuthor(authorId)
             );
 
+            // Then
             assertEquals("Author not found with id: " + authorId, exception.getMessage());
             verify(BookServiceTest.this.authorRepository, times(1)).findById(authorId);
             verifyNoInteractions(BookServiceTest.this.bookRepository);
@@ -347,6 +353,7 @@ class BookServiceTest {
                     () -> BookServiceTest.this.bookService.getAuthorWithBooks(authorId)
             );
 
+            // Then
             assertEquals("Author not found with id: " + authorId, exception.getMessage());
             verify(BookServiceTest.this.authorRepository, times(1)).findByIdWithBooks(authorId);
             verifyNoInteractions(BookServiceTest.this.bookMapper);
@@ -367,6 +374,7 @@ class BookServiceTest {
             // When
             AuthorDTO authorBookCounts = BookServiceTest.this.bookService.getAuthorWithBooks(authorId);
 
+            // Then
             assertEquals(20, authorBookCounts.getTotalBooks());
             verify(BookServiceTest.this.authorRepository, times(1)).findByIdWithBooks(authorId);
             verify(BookServiceTest.this.bookMapper, times(1)).toAuthorDTO(author);
@@ -390,6 +398,7 @@ class BookServiceTest {
                     () -> BookServiceTest.this.bookService.deleteBook(bookId)
             );
 
+            // Then
             assertEquals("Book not found with id: " + bookId, exception.getMessage());
             verify(BookServiceTest.this.bookRepository, times(1)).existsById(bookId);
             verify(BookServiceTest.this.bookRepository, never()).deleteById(bookId);
@@ -408,6 +417,7 @@ class BookServiceTest {
                     () -> BookServiceTest.this.bookService.deleteBook(bookId)
             );
 
+            // Then
             verify(BookServiceTest.this.bookRepository, times(1)).existsById(bookId);
             verify(BookServiceTest.this.bookRepository, times(1)).deleteById(bookId);
         }
