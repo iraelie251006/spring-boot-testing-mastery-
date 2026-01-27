@@ -155,6 +155,7 @@ class BookServiceTest {
             when(BookServiceTest.this.authorRepository.findById(request.getAuthorId()))
                     .thenReturn(Optional.empty());
 
+            // When
             ResourceNotFoundException exception = assertThrows(
                     ResourceNotFoundException.class,
                     () -> BookServiceTest.this.bookService.createBook(request)
@@ -265,6 +266,7 @@ class BookServiceTest {
             when(BookServiceTest.this.bookRepository.findById(bookId))
                     .thenReturn(Optional.empty());
 
+            // When
             ResourceNotFoundException exception = assertThrows(
                     ResourceNotFoundException.class,
                     () -> BookServiceTest.this.bookService.updateBook(bookId, request)
@@ -287,6 +289,7 @@ class BookServiceTest {
             when(BookServiceTest.this.publisherRepository.findById(request.getPublisherId()))
                     .thenReturn(Optional.empty());
 
+            // When
             ResourceNotFoundException exception = assertThrows(
                     ResourceNotFoundException.class,
                     () -> BookServiceTest.this.bookService.updateBook(bookId, request)
@@ -313,6 +316,7 @@ class BookServiceTest {
             when(BookServiceTest.this.authorRepository.findById(authorId))
                     .thenReturn(Optional.empty());
 
+            // When
             ResourceNotFoundException exception = assertThrows(
                     ResourceNotFoundException.class,
                     () -> BookServiceTest.this.bookService.getBooksByAuthor(authorId)
@@ -337,6 +341,7 @@ class BookServiceTest {
             when(BookServiceTest.this.authorRepository.findByIdWithBooks(authorId))
                     .thenReturn(Optional.empty());
 
+            // When
             ResourceNotFoundException exception = assertThrows(
                     ResourceNotFoundException.class,
                     () -> BookServiceTest.this.bookService.getAuthorWithBooks(authorId)
@@ -359,6 +364,7 @@ class BookServiceTest {
             when(BookServiceTest.this.bookMapper.toAuthorDTO(BookServiceTest.this.author))
                     .thenReturn(BookServiceTest.this.authorDTO);
 
+            // When
             AuthorDTO authorBookCounts = BookServiceTest.this.bookService.getAuthorWithBooks(authorId);
 
             assertEquals(20, authorBookCounts.getTotalBooks());
@@ -378,6 +384,7 @@ class BookServiceTest {
             when(BookServiceTest.this.bookRepository.existsById(bookId))
                     .thenReturn(false);
 
+            // When
             ResourceNotFoundException exception = assertThrows(
                     ResourceNotFoundException.class,
                     () -> BookServiceTest.this.bookService.deleteBook(bookId)
@@ -396,6 +403,7 @@ class BookServiceTest {
             when(BookServiceTest.this.bookRepository.existsById(bookId))
                     .thenReturn(true);
 
+            // When
             assertDoesNotThrow(
                     () -> BookServiceTest.this.bookService.deleteBook(bookId)
             );
