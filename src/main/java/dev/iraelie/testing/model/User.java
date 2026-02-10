@@ -1,4 +1,65 @@
 package dev.iraelie.testing.model;
 
+import jakarta.persistence.*;
+import lombok.NonNull;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.util.CollectionUtils;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
+
 public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
+    @Column(name = "FIRST_NAME", nullable = false)
+    private String firstName;
+    @Column(name = "LAST_NAME", nullable = false)
+    private String lastName;
+    @Column(name = "EMAIL", unique = true, nullable = false)
+    private String email;
+    @Column(name = "PHONE_NUMBER", unique = true, nullable = false)
+    private String phoneNumber;
+    @Column(name = "PASSWORD", nullable = false)
+    private String password;
+    @Column(name = "DATE_OF_BIRTH")
+    private LocalDate dateOfBirth;
+    @Column(name = "IS_ENABLED")
+    private boolean enabled;
+    @Column(name = "IS_ACCOUNT_LOCKED")
+    private boolean locked;
+    @Column(name = "IS_CRENDETIAL_EXPIRED")
+    private boolean credentialsExpired;
+    @Column(name = "IS_EMAIL_VERIFIED")
+    private boolean emailVerified;
+    @Column(name = "PROFILE_PICTURE_URL")
+    private String profilePictureUrl;
+    @Column(name = "IS_PHONE_VERIFIED")
+    private boolean phoneVerified;
+    @CreatedDate
+    @Column(name = "CREATED_DATE", updatable = false, nullable = false)
+    private LocalDateTime createdDate;
+    @LastModifiedDate
+    @Column(name = "LAST_MODIFIED_DATE", insertable = false)
+    private LocalDateTime lastModifiedDate;
+
+    @ManyToMany(
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            fetch = FetchType.EAGER
+    )
+    @JoinTable(
+            name = "USERS_ROLES",
+            joinColumns = {
+                    @JoinColumn(name = "users_id")
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name = "roles_id")
+            }
+    )
+    private List<Role> roles;
 }
